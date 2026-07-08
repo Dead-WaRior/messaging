@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Feed — Mini Social</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/base.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar" id="sidebar-slot"></aside>
+
+    <main>
+      <!-- Create post -->
+      <div class="card create-post">
+        <div id="me-avatar-slot"></div>
+        <div class="content-area">
+          <textarea class="input" id="new-content" placeholder="What's on your mind?" maxlength="5000"></textarea>
+          <div id="image-preview-slot"></div>
+          <div class="actions">
+            <label class="file-btn" title="Attach image">
+              📷 <span>Photo</span>
+              <input type="file" id="image-input" accept="image/*" />
+            </label>
+            <button class="btn btn-primary btn-sm" id="post-btn" disabled>Post</button>
+          </div>
+          <div id="post-alert" class="alert alert-error" style="margin-top:8px;"></div>
+        </div>
+      </div>
+
+      <!-- Feed tabs -->
+      <div style="display:flex; gap:8px; margin: 16px 4px;">
+        <button class="btn btn-sm btn-secondary feed-tab active" data-feed="all">Everyone</button>
+        <button class="btn btn-sm btn-ghost feed-tab" data-feed="following">Following</button>
+      </div>
+
+      <div id="feed-list"></div>
+
+      <div id="load-more-wrap" style="text-align:center; margin: 16px 0;"></div>
+    </main>
+
+    <aside class="right-rail">
+      <div class="card">
+        <h3>Discover</h3>
+        <div id="discover-slot" class="text-muted" style="font-size:14px;">Loading…</div>
+      </div>
+    </aside>
+  </div>
+
+  <script src="/js/api.js"></script>
+  <script src="/js/app.js"></script>
+  <script src="/js/feed.js"></script>
+</body>
+</html>

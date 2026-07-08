@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Log in — Mini Social</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/base.css" />
+</head>
+<body>
+  <main class="auth-shell">
+    <div class="auth-card">
+      <div class="auth-logo">social<span class="dot">.</span></div>
+      <div class="card">
+        <h1 style="text-align:center; margin-bottom: 4px;">Welcome back</h1>
+        <p class="text-muted" style="text-align:center; margin-bottom: 20px;">Log in to your account</p>
+
+        <div id="alert" class="alert alert-error"></div>
+
+        <form id="login-form" autocomplete="on">
+          <div class="form-group">
+            <label for="identifier">Username or email</label>
+            <input class="input" type="text" id="identifier" name="identifier" required autofocus />
+          </div>
+          <div class="form-group">
+            <label for="password">Password</label>
+            <input class="input" type="password" id="password" name="password" required minlength="8" />
+          </div>
+          <button class="btn btn-primary" type="submit" style="width:100%;" id="submit-btn">Log in</button>
+        </form>
+
+        <div class="auth-footer">
+          New here? <a href="/signup.html">Create an account</a>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script src="/js/api.js"></script>
+  <script>
+    // If already logged in, go straight to feed.
+    if (API.getToken()) window.location.replace('/feed.html');
+
+    const form = document.getElementById('login-form');
+    const alertEl = document.getElementById('alert');
+    const btn = document.getElementById('submit-btn');
+
+    function showError(msg) {
+      alertEl.textContent = msg;
+      alertEl.classList.add('show');
+    }
+    function clearError() { alertEl.classList.remove('show'); }
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      clearError();
+      btn.disabled = true;
+      btn.textContent = 'Logging in…';
+      try {
+        const identifier = document.getElementById('identifier').value.trim();
+        const password = document.getElementById('password').value;
+        const res = await API.request('/api/auth/login', {
+          method: 'POST',
+          body: { identifier, password },
+        });
+        API.setAuth(res.token, res.user);
+        window.location.href = '/feed.html';
+      } catch (err) {
+        showError(err.message || 'Login failed');
+        btn.disabled = false;
+        btn.textContent = 'Log in';
+      }
+    });
+  </script>
+</body>
+</html>

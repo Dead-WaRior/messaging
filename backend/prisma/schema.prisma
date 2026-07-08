@@ -1,0 +1,89 @@
+// Prisma schema — Mini Social Media App
+// Column names/types conform to 00-project-overview.md exactly.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  // Dev: SQLite. For prod (Week 3): change provider to "postgresql"
+  // and set DATABASE_URL to your Postgres connection string.
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id              Int      @id @default(autoincrement())
+  username        String   @unique
+  email           String   @unique
+  password_hash   String
+  bio             String?
+  profile_pic_url String?
+  created_at      DateTime @default(now())
+
+  posts     Post[]    @relation("UserPosts")
+  comments  Comment[] @relation("UserComments")
+  likes     Like[]    @relation("UserLikes")
+  followers Follow[]  @relation("Following") // rows where this user is being followed
+  following Follow[]  @relation("Follower")  // rows where this user is following someone
+
+  @@map("users")
+}
+
+model Post {
+  id         Int      @id @default(autoincrement())
+  user_id    Int
+  content    String
+  image_url  String?
+  created_at DateTime @default(now())
+
+  author   User      @relation("UserPosts", fields: [user_id], references: [id], onDelete: Cascade)
+  comments Comment[]
+  likes    Like[]
+
+  @@index([created_at])
+  @@index([user_id])
+  @@map("posts")
+}
+
+model Comment {
+  id         Int      @id @default(autoincrement())
+  post_id    Int
+  user_id    Int
+  content    String
+  created_at DateTime @default(now())
+
+  post   Post @relation(fields: [post_id], references: [id], onDelete: Cascade)
+  author User @relation("UserComments", fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@index([post_id])
+  @@map("comments")
+}
+
+model Like {
+  id         Int      @id @default(autoincrement())
+  post_id    Int
+  user_id    Int
+  created_at DateTime @default(now())
+
+  post Post @relation(fields: [post_id], references: [id], onDelete: Cascade)
+  user User @relation("UserLikes", fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@unique([post_id, user_id])
+  @@index([user_id])
+  @@map("likes")
+}
+
+model Follow {
+  id           Int      @id @default(autoincrement())
+  follower_id  Int
+  following_id Int
+  created_at   DateTime @default(now())
+
+  follower  User @relation("Follower", fields: [follower_id], references: [id], onDelete: Cascade)
+  following User @relation("Following", fields: [following_id], references: [id], onDelete: Cascade)
+
+  @@unique([follower_id, following_id])
+  @@index([following_id])
+  @@map("follows")
+}

@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Sign up — Mini Social</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/base.css" />
+</head>
+<body>
+  <main class="auth-shell">
+    <div class="auth-card">
+      <div class="auth-logo">social<span class="dot">.</span></div>
+      <div class="card">
+        <h1 style="text-align:center; margin-bottom: 4px;">Create account</h1>
+        <p class="text-muted" style="text-align:center; margin-bottom: 20px;">Join the conversation</p>
+
+        <div id="alert" class="alert alert-error"></div>
+
+        <form id="signup-form" autocomplete="on">
+          <div class="form-group">
+            <label for="username">Username</label>
+            <input class="input" type="text" id="username" name="username" required minlength="3" maxlength="30" pattern="[a-zA-Z0-9_.\-]+" />
+          </div>
+          <div class="form-group">
+            <label for="email">Email</label>
+            <input class="input" type="email" id="email" name="email" required />
+          </div>
+          <div class="form-group">
+            <label for="password">Password</label>
+            <input class="input" type="password" id="password" name="password" required minlength="8" />
+          </div>
+          <div class="form-group">
+            <label for="confirm">Confirm password</label>
+            <input class="input" type="password" id="confirm" name="confirm" required minlength="8" />
+          </div>
+          <button class="btn btn-primary" type="submit" style="width:100%;" id="submit-btn">Create account</button>
+        </form>
+
+        <div class="auth-footer">
+          Already have an account? <a href="/login.html">Log in</a>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script src="/js/api.js"></script>
+  <script>
+    if (API.getToken()) window.location.replace('/feed.html');
+
+    const form = document.getElementById('signup-form');
+    const alertEl = document.getElementById('alert');
+    const btn = document.getElementById('submit-btn');
+
+    function showError(msg) { alertEl.textContent = msg; alertEl.classList.add('show'); }
+    function clearError() { alertEl.classList.remove('show'); }
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      clearError();
+
+      const username = document.getElementById('username').value.trim();
+      const email = document.getElementById('email').value.trim();
+      const password = document.getElementById('password').value;
+      const confirm = document.getElementById('confirm').value;
+
+      if (password !== confirm) {
+        showError('Passwords do not match');
+        return;
+      }
+
+      btn.disabled = true;
+      btn.textContent = 'Creating…';
+      try {
+        const res = await API.request('/api/auth/register', {
+          method: 'POST',
+          body: { username, email, password },
+        });
+        API.setAuth(res.token, res.user);
+        window.location.href = '/feed.html';
+      } catch (err) {
+        showError(err.message || 'Signup failed');
+        btn.disabled = false;
+        btn.textContent = 'Create account';
+      }
+    });
+  </script>
+</body>
+</html>

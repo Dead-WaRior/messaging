@@ -1,0 +1,12 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Mini Social</title>
+  <script>
+    const t = localStorage.getItem('token');
+    window.location.replace(t ? '/feed.html' : '/login.html');
+  </script>
+</head>
+<body></body>
+</html>
